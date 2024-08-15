@@ -4,6 +4,7 @@ Template Component main class.
 '''
 import csv
 import logging
+import pycurl
 from collections import defaultdict
 
 from keboola.component.base import ComponentBase
