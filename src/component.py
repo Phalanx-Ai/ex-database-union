@@ -42,7 +42,7 @@ class Component(ComponentBase):
         self.validate_image_parameters(REQUIRED_IMAGE_PARS)
         params = self.configuration.parameters
 
-        logging.info (params)
+        logging.info(params)
         # Access parameters in data/config.json
         if params.get(KEY_COLUMNS):
             logging.info(params[KEY_COLUMNS])
@@ -65,6 +65,7 @@ class Component(ComponentBase):
 
         # Write new state - will be available next run
         self.write_state_file({"some_state_parameter": "value"})
+
 
 """
         Main entrypoint
