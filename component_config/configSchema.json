@@ -2,7 +2,8 @@
   "type": "object",
   "title": "Extractor configuration",
   "required": [
-    "columns"
+    "columns",
+    "#api_token"
   ],
   "properties": {
     "columns": {
@@ -28,6 +29,10 @@
           }
         }
       }
+    },
+    "#api_token": {
+      "type": "password",
+      "title": "Keboola API Token"
     },
     "debug": {
       "type": "boolean",
