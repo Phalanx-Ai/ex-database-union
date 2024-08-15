@@ -92,13 +92,48 @@ class Component(ComponentBase):
             "https://connection.north-europe.azure.keboola.com/v2/storage/components/%s/configs/%s" % \
             (ROW_COMPONENT_ID, configuration_id)
 
+        URL_RUN_JOB = "https://queue.north-europe.azure.keboola.com/jobs"
+
         curl.setopt(pycurl.URL, URL_GET_CONFIG_DETAIL)
         curl.setopt(pycurl.HTTPHEADER, ["X-StorageApi-Token: %s" % (auth_token)])
         curl.setopt(pycurl.WRITEFUNCTION, http_data.write)
         curl.perform()
 
         example_configuration = json.loads(http_data.getvalue())
+
         print(example_configuration)
+
+        # @todo: run job with example configuration modified
+        http_data = BytesIO()
+        curl.setopt(pycurl.URL, URL_RUN_JOB)
+        curl.setopt(pycurl.HTTPHEADER, [
+            "X-StorageApi-Token: %s" % (auth_token),
+            "Content-Type: application/json"
+        ])
+        curl.setopt(pycurl.POST, 1)
+        data = {
+            "component": ROW_COMPONENT_ID,
+            # Job "..3" ended with user error: "Configuration ID not set, but is required for default_bucket option."
+            "config": configuration_id,
+            # current-bug: ERROR: The child config "path" under "root.parameters" must be configured. [] []
+            "configData": example_configuration['configuration'],
+            "mode": "run"
+        }
+
+        print("A<>><<>>>")
+        print(json.dumps(data))
+        print("B<>><<>>>")
+
+        curl.setopt(pycurl.POSTFIELDS, json.dumps(data))
+        curl.setopt(pycurl.WRITEFUNCTION, http_data.write)
+        curl.perform()
+
+        print("PERFORM")
+        response = json.loads(http_data.getvalue())
+        print(response)
+
+        print("DONE")
+        #
 
         logging.info("CSV tables part")
         table_structures = self._get_table_structures()
