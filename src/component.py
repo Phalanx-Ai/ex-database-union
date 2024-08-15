@@ -5,6 +5,8 @@ Template Component main class.
 import csv
 import logging
 import pycurl
+import json
+from io import BytesIO
 from collections import defaultdict
 
 from keboola.component.base import ComponentBase
@@ -13,11 +15,17 @@ from keboola.component.exceptions import UserException
 # configuration variables
 KEY_COLUMNS = 'columns'
 KEY_DATABASE_NAME = 'database'
+KEY_AUTH_TOKEN = '#api_token'
+KEY_EXAMPLE_CONFIGURATION_ID = "example_config_id"
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
-REQUIRED_PARAMETERS = [KEY_COLUMNS, KEY_DATABASE_NAME]
+REQUIRED_PARAMETERS = [KEY_COLUMNS, KEY_DATABASE_NAME, KEY_EXAMPLE_CONFIGURATION_ID,
+                       KEY_AUTH_TOKEN]
 REQUIRED_IMAGE_PARS = []
+
+# @note: This is fixed as change of component requires code modification
+ROW_COMPONENT_ID = "keboola.ex-ftp"
 
 
 class Component(ComponentBase):
@@ -63,9 +71,30 @@ class Component(ComponentBase):
         params = self.configuration.parameters
         logging.info(params)
 
+        logging.info("Keboola API part - get example configuration")
+        token = params.get(KEY_AUTH_TOKEN)
+        configuration_id = params.get(KEY_EXAMPLE_CONFIGURATION_ID)
+        URL_GET_CONFIG_DETAIL = \
+            "https://connection.north-europe.azure.keboola.com/v2/storage/components/%s/configs/%s" % \
+            (ROW_COMPONENT_ID, configuration_id)
+
+        http_data = BytesIO()
+        curl = pycurl.Curl()
+        # @todo: development only - token from Chrome works; token from Keboola not
+        curl.setopt(pycurl.SSL_VERIFYHOST, 0)
+        curl.setopt(pycurl.SSL_VERIFYPEER, 0)
+        #
+        curl.setopt(pycurl.URL, URL_GET_CONFIG_DETAIL)
+        curl.setopt(pycurl.HTTPHEADER, ["X-StorageApi-Token: %s" % (token)])
+        curl.setopt(pycurl.WRITEFUNCTION, http_data.write)
+        curl.perform()
+
+        example_configuration = json.loads(http_data.getvalue())
+        print(example_configuration)
+
+        logging.info("CSV tables part")
         table_structures = self._get_table_structures()
         for table_name in table_structures.keys():
-            # @todo: set all rows to the same destination (output can be folder?)
             csv_filename = self._get_unique_prefix_for_db() + "%s.csv" % (table_name)
 
             table = self.create_out_table_definition(

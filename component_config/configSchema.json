@@ -34,10 +34,13 @@
       "type": "password",
       "title": "Keboola API Token"
     },
+    "example_config_id": {
+      "type": "string",
+      "title": "ID of base configuration for rows"
+    },
     "debug": {
       "type": "boolean",
-      "title": "Debug",
-      "propertyOrder": 2
+      "title": "Debug"
     }
   }
 }
