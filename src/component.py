@@ -11,10 +11,11 @@ from keboola.component.exceptions import UserException
 
 # configuration variables
 KEY_COLUMNS = 'columns'
+KEY_DATABASE_NAME = 'database'
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
-REQUIRED_PARAMETERS = [KEY_COLUMNS]
+REQUIRED_PARAMETERS = [KEY_COLUMNS, KEY_DATABASE_NAME]
 REQUIRED_IMAGE_PARS = []
 
 
@@ -47,10 +48,10 @@ class Component(ComponentBase):
 
     def _get_unique_prefix_for_db(self):
         # @todo: fix according to real databases name
-        # DATABASE_NAME = "foo_2024"
-        DATABASE_COMPANY = "foo"
-        DATABASE_YEAR = str(2024)
-        #
+        name_parts = self.configuration.parameters[KEY_DATABASE_NAME].split('_', 3)
+
+        DATABASE_COMPANY = name_parts[0]
+        DATABASE_YEAR = name_parts[1]
 
         return "%s_%s_" % (DATABASE_COMPANY, DATABASE_YEAR)
 
