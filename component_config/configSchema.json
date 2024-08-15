@@ -30,9 +30,9 @@
         }
       }
     },
-    "#api_token": {
+    "#auth_token": {
       "type": "password",
-      "title": "Keboola API Token"
+      "title": "Keboola API Token (from Project Settings)"
     },
     "example_config_id": {
       "type": "string",

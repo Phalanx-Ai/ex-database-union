@@ -15,7 +15,7 @@ from keboola.component.exceptions import UserException
 # configuration variables
 KEY_COLUMNS = 'columns'
 KEY_DATABASE_NAME = 'database'
-KEY_AUTH_TOKEN = '#api_token'
+KEY_AUTH_TOKEN = '#auth_token'
 KEY_EXAMPLE_CONFIGURATION_ID = "example_config_id"
 
 # list of mandatory parameters => if some is missing,
@@ -64,6 +64,16 @@ class Component(ComponentBase):
 
         return "%s_%s_" % (DATABASE_COMPANY, DATABASE_YEAR)
 
+    def _get_curl(self):
+        curl = pycurl.Curl()
+
+        # @todo: development only - token from Chrome works; token from Keboola not
+        curl.setopt(pycurl.SSL_VERIFYHOST, 0)
+        curl.setopt(pycurl.SSL_VERIFYPEER, 0)
+        #
+
+        return curl
+
     def run(self):
         # check for missing configuration parameters
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
@@ -71,21 +81,19 @@ class Component(ComponentBase):
         params = self.configuration.parameters
         logging.info(params)
 
+        # @todo: refactor to functions
         logging.info("Keboola API part - get example configuration")
-        token = params.get(KEY_AUTH_TOKEN)
+        http_data = BytesIO()
+        curl = self._get_curl()
+        auth_token = params.get(KEY_AUTH_TOKEN)
+
         configuration_id = params.get(KEY_EXAMPLE_CONFIGURATION_ID)
         URL_GET_CONFIG_DETAIL = \
             "https://connection.north-europe.azure.keboola.com/v2/storage/components/%s/configs/%s" % \
             (ROW_COMPONENT_ID, configuration_id)
 
-        http_data = BytesIO()
-        curl = pycurl.Curl()
-        # @todo: development only - token from Chrome works; token from Keboola not
-        curl.setopt(pycurl.SSL_VERIFYHOST, 0)
-        curl.setopt(pycurl.SSL_VERIFYPEER, 0)
-        #
         curl.setopt(pycurl.URL, URL_GET_CONFIG_DETAIL)
-        curl.setopt(pycurl.HTTPHEADER, ["X-StorageApi-Token: %s" % (token)])
+        curl.setopt(pycurl.HTTPHEADER, ["X-StorageApi-Token: %s" % (auth_token)])
         curl.setopt(pycurl.WRITEFUNCTION, http_data.write)
         curl.perform()
 
