@@ -1,14 +1,32 @@
 {
   "type": "object",
-  "title": "extractor configuration",
+  "title": "Extractor configuration",
   "required": [
-    "print_hello"
   ],
   "properties": {
-    "print_hello": {
-      "type": "boolean",
-      "title": "Print Hello",
-      "propertyOrder": 1
+    "columns": {
+      "type": "array",
+      "description": "Exported Columns from Databases",
+      "propertyOrder": 100,
+      "items": {
+        "type": "object",
+        "title": "Name of Table/Column",
+        "description": "Foo",
+        "required": [
+          "table",
+          "column"
+        ],
+        "properties": {
+          "table": {
+            "type": "string",
+            "title": "Table"
+          },
+          "column": {
+            "type": "string",
+            "title": "Column"
+          }
+        }
+      }
     },
     "debug": {
       "type": "boolean",
