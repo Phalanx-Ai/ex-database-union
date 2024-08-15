@@ -1,1 +1,14 @@
-{}
+{
+    "type": "object",
+    "title": "Databases",
+    "required": [
+        "database"
+    ],
+    "properties": {
+        "database": {
+            "type": "string",
+            "title": "DB",
+            "description": "Foo"
+        }
+    }
+}
