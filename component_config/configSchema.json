@@ -2,6 +2,7 @@
   "type": "object",
   "title": "Extractor configuration",
   "required": [
+    "columns"
   ],
   "properties": {
     "columns": {
