@@ -3,7 +3,7 @@
   "title": "Extractor configuration",
   "required": [
     "columns",
-    "#api_token"
+    "#auth_token"
   ],
   "properties": {
     "columns": {
