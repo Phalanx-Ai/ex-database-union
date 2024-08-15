@@ -10,12 +10,11 @@ from keboola.component.base import ComponentBase
 from keboola.component.exceptions import UserException
 
 # configuration variables
-KEY_API_TOKEN = '#api_token'
-KEY_PRINT_HELLO = 'print_hello'
+KEY_COLUMNS = 'columns'
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
-REQUIRED_PARAMETERS = [KEY_PRINT_HELLO]
+REQUIRED_PARAMETERS = [KEY_COLUMNS]
 REQUIRED_IMAGE_PARS = []
 
 
@@ -38,18 +37,15 @@ class Component(ComponentBase):
         Main execution code
         '''
 
-        # ####### EXAMPLE TO REMOVE
         # check for missing configuration parameters
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
         self.validate_image_parameters(REQUIRED_IMAGE_PARS)
         params = self.configuration.parameters
-        # Access parameters in data/config.json
-        if params.get(KEY_PRINT_HELLO):
-            logging.info("Hello World")
 
-        # get last state data/in/state.json from previous run
-        previous_state = self.get_state_file()
-        logging.info(previous_state.get('some_state_parameter'))
+        logging.info (params)
+        # Access parameters in data/config.json
+        if params.get(KEY_COLUMNS):
+            logging.info(params[KEY_COLUMNS])
 
         # Create output table (Tabledefinition - just metadata)
         table = self.create_out_table_definition('output.csv', incremental=True, primary_key=['timestamp'])
@@ -70,16 +66,12 @@ class Component(ComponentBase):
         # Write new state - will be available next run
         self.write_state_file({"some_state_parameter": "value"})
 
-        # ####### EXAMPLE TO REMOVE END
-
-
 """
         Main entrypoint
 """
 if __name__ == "__main__":
     try:
         comp = Component()
-        # this triggers the run method by default and is controlled by the configuration.action parameter
         comp.execute_action()
     except UserException as exc:
         logging.exception(exc)
